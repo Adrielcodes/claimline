@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --line: #e3e6eb;
+  --ink: #111827;
+  --muted: #5b6475;
+  --faint: #8a93a3;
+  --accent: #1d4ed8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8efff;
+  --danger: #b42318;
+
+  --route-fast-track: #15803d;
+  --route-standard: #475569;
+  --route-bodily-injury: #b45309;
+  --route-total-loss: #7c3aed;
+  --route-special-investigations: #c2410c;
+  --route-coverage-review: #0e7490;
+
+  --sev-coverage: #0e7490;
+  --sev-fraud: #c2410c;
+  --sev-severity: #475569;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0e13;
+    --surface: #12161d;
+    --surface-2: #181d26;
+    --line: #262c37;
+    --ink: #e8ebf0;
+    --muted: #9aa3b2;
+    --faint: #6b7483;
+    --accent: #7aa2ff;
+    --accent-ink: #0b0e13;
+    --accent-soft: #1a2440;
+    --danger: #f97066;
+
+    --route-fast-track: #4ade80;
+    --route-standard: #a3b1c6;
+    --route-bodily-injury: #fbbf24;
+    --route-total-loss: #c4a5ff;
+    --route-special-investigations: #fb923c;
+    --route-coverage-review: #5ed3ec;
+
+    --sev-coverage: #5ed3ec;
+    --sev-fraud: #fb923c;
+    --sev-severity: #a3b1c6;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.925rem;
+  color: var(--ink);
+}
+.field:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.field[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}

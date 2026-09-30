@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Claimline.Api/Claimline.Api.csproj" />
+    <Project Path="src/Claimline.Contracts/Claimline.Contracts.csproj" />
+    <Project Path="src/Claimline.ServiceDefaults/Claimline.ServiceDefaults.csproj" />
+    <Project Path="src/Claimline.Triage/Claimline.Triage.csproj" />
+    <Project Path="src/Claimline.Worker/Claimline.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Claimline.Api.Tests/Claimline.Api.Tests.csproj" />
+    <Project Path="tests/Claimline.Triage.Tests/Claimline.Triage.Tests.csproj" />
+  </Folder>
+</Solution>

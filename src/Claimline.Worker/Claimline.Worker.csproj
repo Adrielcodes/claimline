@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <UserSecretsId>claimline-worker</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Claimline.Contracts\Claimline.Contracts.csproj" />
+    <ProjectReference Include="..\Claimline.ServiceDefaults\Claimline.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Claimline.Triage\Claimline.Triage.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+</Project>

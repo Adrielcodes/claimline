@@ -1,0 +1,13 @@
+bin/
+obj/
+*.user
+.vs/
+.vscode/
+node_modules/
+.next/
+out/
+.env
+.env.local
+*.log
+TestResults/
+coverage/

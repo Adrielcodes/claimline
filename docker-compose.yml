@@ -1,0 +1,80 @@
+# Full local stack: `docker compose up --build`, then open http://localhost:3100
+# Infra only (run the .NET services with `dotnet run`): `docker compose up sqlserver servicebus dashboard`
+
+x-sa-password: &sa-password "Claimline!Local1"
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: *sa-password
+    ports: ["1433:1433"]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  # Official Azure Service Bus emulator. Topology comes from deploy/servicebus-emulator.json,
+  # which mirrors the topic, subscriptions and filters that infra/ provisions in Azure.
+  servicebus:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    volumes:
+      - ./deploy/servicebus-emulator.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+    environment:
+      ACCEPT_EULA: "Y"
+      SQL_SERVER: sqlserver
+      MSSQL_SA_PASSWORD: *sa-password
+    ports: ["5672:5672", "5300:5300"]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  # OpenTelemetry traces, metrics and logs for every service: http://localhost:18888
+  dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+    environment:
+      ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports: ["18888:18888", "4317:18889"]
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Claimline.Api/Dockerfile
+    environment:
+      ConnectionStrings__Claims: "Server=sqlserver,1433;Database=claimline;User Id=sa;Password=Claimline!Local1;TrustServerCertificate=true"
+      ConnectionStrings__ServiceBus: "Endpoint=sb://servicebus;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://dashboard:18889
+    ports: ["5080:8080"]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      servicebus:
+        condition: service_started
+    restart: on-failure
+
+  worker:
+    build:
+      context: .
+      dockerfile: src/Claimline.Worker/Dockerfile
+    environment:
+      ConnectionStrings__ServiceBus: "Endpoint=sb://servicebus;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://dashboard:18889
+      # Optional: point at an Azure OpenAI deployment (az login credentials are not available in the
+      # container, so this only works with managed identity in Azure). Leave empty to use the heuristic analyzer.
+      AzureOpenAI__Endpoint: ""
+    depends_on:
+      servicebus:
+        condition: service_started
+    restart: on-failure
+
+  web:
+    build:
+      context: web
+    environment:
+      API_URL: http://api:8080
+    ports: ["3100:3000"]
+    depends_on: [api]
